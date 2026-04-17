@@ -25,11 +25,16 @@ permissions:
 jobs:
   build:
     name: Build custom XCFramework
-    runs-on: macos-latest
+    runs-on: macos-26
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Pin Xcode 26
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.0'
 
       - name: Install build dependencies
         run: |
