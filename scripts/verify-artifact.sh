@@ -82,8 +82,10 @@ if command -v nm >/dev/null 2>&1 && [[ -f "$ROOT/config/public-symbols.txt" ]]; 
     while IFS= read -r symbol; do
         [[ -z "$symbol" || "$symbol" == \#* ]] && continue
 
+        # Avoid `grep -q` here: with `set -o pipefail`, an early grep exit can
+        # make a successful nm run look like a failure if nm receives SIGPIPE.
         if xargs nm -gU < "$BINARY_LIST" 2>/dev/null |
-            grep -Eq "(^|[[:space:]])_?${symbol}$"; then
+            grep -E "(^|[[:space:]])_?${symbol}$" >/dev/null; then
             log "found symbol: $symbol"
         else
             printf '[LlamaAppleRuntime] missing symbol: %s\n' "$symbol" >&2
