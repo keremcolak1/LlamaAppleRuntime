@@ -1,0 +1,11 @@
+# Required exported C symbols for downstream bridges.
+# verify-artifact.sh checks these when nm is available and framework binaries are present.
+
+llama_backend_init
+llama_backend_free
+mtmd_context_params_default
+mtmd_init_from_file
+mtmd_free
+mtmd_tokenize
+mtmd_helper_eval_chunks
+mtmd_helper_bitmap_init_from_file

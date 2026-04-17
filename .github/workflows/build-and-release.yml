@@ -1,0 +1,76 @@
+name: Build LlamaAppleRuntime
+
+on:
+  workflow_dispatch:
+    inputs:
+      llama_revision:
+        description: "Pinned llama.cpp tag or commit to build"
+        required: true
+        default: "b8827"
+        type: string
+      release_version:
+        description: "Runtime package release version"
+        required: true
+        default: "0.1.0-dev"
+        type: string
+      publish_release:
+        description: "Publish a GitHub release after packaging"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build custom XCFramework
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          brew install cmake
+
+      - name: Fetch pinned llama.cpp
+        env:
+          LLAMA_APPLE_OVERRIDE_REVISION: ${{ inputs.llama_revision }}
+        run: scripts/bootstrap-upstream.sh --revision "${{ inputs.llama_revision }}"
+
+      - name: Build XCFramework
+        env:
+          LLAMA_APPLE_OVERRIDE_REVISION: ${{ inputs.llama_revision }}
+        run: scripts/build-xcframework.sh --skip-bootstrap
+
+      - name: Package release artifact
+        env:
+          LLAMA_APPLE_OVERRIDE_REVISION: ${{ inputs.llama_revision }}
+          LLAMA_APPLE_OVERRIDE_RELEASE_VERSION: ${{ inputs.release_version }}
+        run: scripts/package-release.sh --version "${{ inputs.release_version }}"
+
+      - name: Verify release artifact
+        env:
+          LLAMA_APPLE_OVERRIDE_REVISION: ${{ inputs.llama_revision }}
+        run: scripts/verify-artifact.sh artifacts/LlamaApple.xcframework.zip
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LlamaApple.xcframework
+          path: |
+            artifacts/LlamaApple.xcframework.zip
+            metadata/current-release.json
+
+      - name: Publish GitHub release
+        if: ${{ inputs.publish_release }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ inputs.release_version }}" \
+            artifacts/LlamaApple.xcframework.zip \
+            metadata/current-release.json \
+            --title "LlamaAppleRuntime ${{ inputs.release_version }}" \
+            --notes "Pinned llama.cpp revision: ${{ inputs.llama_revision }}"

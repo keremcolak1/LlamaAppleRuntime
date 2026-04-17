@@ -1,0 +1,8 @@
+{
+  "version": "0.1.0",
+  "upstreamRepository": "https://github.com/ggml-org/llama.cpp.git",
+  "upstreamRevision": "b8827",
+  "artifact": "LlamaApple.xcframework.zip",
+  "checksum": "0000000000000000000000000000000000000000000000000000000000000000"
+}
+

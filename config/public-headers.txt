@@ -1,0 +1,8 @@
+# Required public headers for downstream bridges.
+# verify-artifact.sh fails if any non-comment entry is missing from the XCFramework.
+
+llama.h
+ggml.h
+gguf.h
+mtmd.h
+mtmd-helper.h

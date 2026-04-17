@@ -1,0 +1,17 @@
+.build/
+.swiftpm/
+DerivedData/
+
+artifacts/*
+!artifacts/.gitkeep
+
+metadata/current-release.json
+metadata/releases/*.json
+!metadata/releases/README.md
+
+*.xcarchive
+*.xcframework
+*.xcframework.zip
+*.dSYM
+*.tmp
+

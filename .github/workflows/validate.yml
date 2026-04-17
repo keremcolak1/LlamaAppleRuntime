@@ -1,0 +1,28 @@
+name: Validate LlamaAppleRuntime
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate package scaffolding
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate SwiftPM manifest
+        run: swift package dump-package >/dev/null
+
+      - name: Validate shell scripts
+        run: |
+          find scripts -name '*.sh' -print0 | xargs -0 -n1 bash -n
+
+      - name: Run runtime script tests
+        run: tests/runtime-scripts-test.sh
+
+      - name: Validate pinned upstream metadata
+        run: scripts/bootstrap-upstream.sh --metadata-only
